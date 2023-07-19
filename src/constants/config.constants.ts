@@ -7,6 +7,10 @@ import {
   SpaceGraphicConfiguration,
 } from "models/models";
 
+export const CHARACTERS: Record<string, string> = {
+  Kendall: "575f84c5-0561-46cf-85ae-70f270ab5bbb",
+};
+
 export const DEFAULT_SQUARE_DIMENSIONS: SimpleDimensions = {
   w: 40,
   h: 40,
@@ -23,7 +27,7 @@ export const STAGE_CONFIG: SimpleDimensions & SimplePosition & SimplePallete = {
 
 export const SPACE_CONFIG: SpaceGraphicConfiguration = {
   ...DEFAULT_SQUARE_DIMENSIONS,
-  fillColor: "#ddd",
+  fillColor: "#aaf",
 };
 
 export const GRID_CONFIG: GridGraphicConfiguration = {

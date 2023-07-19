@@ -1,23 +1,26 @@
-import { Entity } from "models/models";
+import { Entity, SimplePosition } from "models/models";
 
 const API = () => {
-  const fetchCharacter = async () => {
-    const query = `{
-        player(id:"575f84c5-0561-46cf-85ae-70f270ab5bbb"){
-            x,
-            y,
-            name
-        }
-    }`;
-    const result = await fetch("http://localhost:9000/graphql", {
+  const baseFetch = async (body: any): Promise<Response> => {
+    return await fetch("http://localhost:9000/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify({
-        query: query,
-      }),
+      body: JSON.stringify(body),
+    });
+  };
+
+  const fetchCharacter = async (id: string) => {
+    const result: Response = await baseFetch({
+      query: `{
+        player(id:"${id}"){
+            x,
+            y,
+            name
+        }
+    }`,
     });
 
     if (result.status === 200) {
@@ -28,7 +31,26 @@ const API = () => {
     }
   };
 
-  return { fetchCharacter };
+  const moveCharacter = async (id: string, pos: SimplePosition) => {
+    const mutation = {
+      query: `mutation Mutation{
+        move(id:"${id}",x:${pos.x},y:${pos.y}){
+          success
+        }
+      }`,
+    };
+
+    const result: Response = await baseFetch(mutation);
+
+    if (result.status === 200) {
+      const character = await result.json();
+      return character.data.player as Entity;
+    } else {
+      return null;
+    }
+  };
+
+  return { fetchCharacter, moveCharacter };
 };
 
 export default API;
