@@ -1,5 +1,5 @@
 import {
-  CharacterGraphicConfiguration,
+  PlayerGraphicConfiguration,
   GridGraphicConfiguration,
   SimpleDimensions,
   SimplePallete,
@@ -7,8 +7,10 @@ import {
   SpaceGraphicConfiguration,
 } from "models/models";
 
-export const CHARACTERS: Record<string, string> = {
-  Kendall: "575f84c5-0561-46cf-85ae-70f270ab5bbb",
+export const API_URL = "http://localhost:9000/graphql";
+
+export const CREATURES: Record<string, string> = {
+  Default: "a7413a34-aa3f-400d-b836-b750299922f5",
 };
 
 export const DEFAULT_SQUARE_DIMENSIONS: SimpleDimensions = {
@@ -37,7 +39,7 @@ export const GRID_CONFIG: GridGraphicConfiguration = {
   fillColor: "#eee",
 };
 
-export const CHARACTER_CONFIGURATION: CharacterGraphicConfiguration = {
+export const CHARACTER_CONFIGURATION: PlayerGraphicConfiguration = {
   x: 10,
   y: 10,
   w: 30,

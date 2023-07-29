@@ -1,8 +1,13 @@
-import { Entity, SimplePosition } from "models/models";
+import { API_URL } from "../constants/config.constants";
+import {
+  PlayerCreature,
+  PlayerCreatureKey,
+  SimplePosition,
+} from "models/models";
 
 const API = () => {
   const baseFetch = async (body: any): Promise<Response> => {
-    return await fetch("http://localhost:9000/graphql", {
+    return await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -12,29 +17,51 @@ const API = () => {
     });
   };
 
-  const fetchCharacter = async (id: string) => {
+  const fetchPlayer = async (
+    id: string,
+    keys: PlayerCreatureKey[]
+  ): Promise<PlayerCreature | null> => {
     const result: Response = await baseFetch({
       query: `{
-        player(id:"${id}"){
-            x,
-            y,
-            name
+        creature(id:"${id}"){
+             ${keys.join(",")}
         }
     }`,
     });
 
     if (result.status === 200) {
       const character = await result.json();
-      return character.data.player as Entity;
+      return character.data.creature as PlayerCreature;
     } else {
       return null;
     }
   };
 
-  const moveCharacter = async (id: string, pos: SimplePosition) => {
+  const fetchPlayers = async (
+    first: number,
+    after: string,
+    keys: PlayerCreatureKey[]
+  ): Promise<PlayerCreature[] | null> => {
+    const result: Response = await baseFetch({
+      query: `{
+        players(first:${first}, after:"${after}"){
+            ${keys.join(",")}
+        }
+    }`,
+    });
+
+    if (result.status === 200) {
+      const character = await result.json();
+      return character.data.players as PlayerCreature[];
+    } else {
+      return null;
+    }
+  };
+
+  const movePlayer = async (id: string, pos: SimplePosition) => {
     const mutation = {
       query: `mutation Mutation{
-        move(id:"${id}",x:${pos.x},y:${pos.y}){
+        movePlayer(id:"${id}",x:${pos.x},y:${pos.y}){
           success
         }
       }`,
@@ -44,13 +71,13 @@ const API = () => {
 
     if (result.status === 200) {
       const character = await result.json();
-      return character.data.player as Entity;
+      return character.data.creature as PlayerCreature;
     } else {
       return null;
     }
   };
 
-  return { fetchCharacter, moveCharacter };
+  return { fetchPlayer, fetchPlayers, movePlayer };
 };
 
 export default API;

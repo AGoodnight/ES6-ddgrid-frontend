@@ -91,7 +91,7 @@ class TraversableSpaces {
     return (coordinate - 1) * this._props.spaceConfig.h;
   };
 
-  moveCharacter = (center: SimplePosition) => {
+  movePlayer = (center: SimplePosition) => {
     this._props?.onMove(this, center);
   };
 
@@ -106,7 +106,7 @@ class TraversableSpaces {
       g.drawRect(thisCenter.x, thisCenter.y, c.h, c.w);
       g.endFill();
       g.on("pointerdown", (event) => {
-        this.moveCharacter(thisCenter);
+        this.movePlayer(thisCenter);
       });
       g.eventMode = "static";
     }

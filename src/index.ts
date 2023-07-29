@@ -1,75 +1,151 @@
-import { Application, Container, autoDetectRenderer } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { drawGrid } from "./factories/grid.factory";
 import {
-  CHARACTERS,
   CHARACTER_CONFIGURATION,
   GRID_CONFIG,
   SPACE_CONFIG,
   STAGE_CONFIG,
 } from "./constants/config.constants";
-import { SimplePosition } from "./models/models";
-import API from "./api/api";
+import { PlayerCreature, SimplePosition } from "./models/models";
 import TraversableSpaces from "./components/traversableSpaces";
-import Character from "./components/character";
+import Player from "./components/player";
 
-const api = API();
+import "./static/index.css";
+import UKSelect, { UKOption } from "./components/ukSelect";
+import PlayerService from "./services/PlayerService";
 
-const init = async () => {
-  const data = await api.fetchCharacter(CHARACTERS.Kendall);
+class Main {
+  private _app: Application<HTMLCanvasElement>;
+  private _playerService: PlayerService;
 
-  if (data) {
-    renderScene({
-      x: data.x,
-      y: data.y,
+  players: PlayerCreature[] = [];
+
+  private cCharacter: Player | undefined;
+  private cSpaces: TraversableSpaces | undefined;
+
+  constructor(playerService: PlayerService) {
+    this._app = new Application<HTMLCanvasElement>({
+      width: STAGE_CONFIG.w,
+      height: STAGE_CONFIG.h,
     });
-  } else {
-    document.querySelector("#Stage")?.append(`Error`);
+    document.querySelector("#Stage")?.appendChild(this._app.view);
+    const container = new Container();
+    const grid = drawGrid(GRID_CONFIG);
+    this._app.stage.addChild(container);
+
+    this._playerService = playerService;
+    this._playerService.currentPlayer$.subscribe((data: PlayerCreature) => {
+      if (data) {
+        if (this.cCharacter && this.cSpaces) {
+          container.removeChild(this.cCharacter.graphic);
+          container.removeChild(this.cSpaces.spaces);
+          container.removeChild(grid);
+        }
+        this.cCharacter = this.renderPlayer({ x: data.x, y: data.y });
+        // console.log(this.cCharacter);
+        if (!this.cCharacter) {
+          return;
+        }
+        this.cSpaces = this.renderTraversableSpaces(this.cCharacter, data);
+        // console.log(this.cSpaces);
+        if (!this.cSpaces) {
+          return;
+        }
+        container.addChild(grid);
+        container.addChild(this.cCharacter.graphic);
+        container.addChild(this.cSpaces.spaces);
+      }
+    });
+
+    this.createForm();
   }
-};
 
-const renderScene = (lastPosition: SimplePosition) => {
-  const app = new Application<HTMLCanvasElement>({
-    width: STAGE_CONFIG.w,
-    height: STAGE_CONFIG.h,
-  });
-  document.querySelector("#Stage")?.appendChild(app.view);
+  createForm = () => {
+    this._playerService.players$.subscribe((fetchedPlayers) => {
+      this.players = fetchedPlayers;
+      const playerOptions = fetchedPlayers?.reduce<UKOption[]>(
+        (options: UKOption[], player: PlayerCreature) => {
+          const _opts = [...options];
+          if (player.id && player.name && this._playerService.currentPlayer) {
+            _opts.push({
+              value: player.id,
+              name: player.name,
+              preSelect: player.id === this._playerService.currentPlayer.id,
+            });
+          }
+          return _opts;
+        },
+        []
+      );
 
-  const container = new Container();
+      if (!playerOptions) {
+        console.error("No Player Options were created, aborting build");
+        return;
+      }
 
-  const grid = drawGrid(GRID_CONFIG);
+      // console.log(playerOptions);
 
-  const character = new Character(
-    CHARACTER_CONFIGURATION,
-    {
-      x: (lastPosition.x - 1) * SPACE_CONFIG.w,
-      y: (lastPosition.y - 1) * SPACE_CONFIG.h,
-    },
-    SPACE_CONFIG
-  );
+      const playerSelectElement = document.querySelector(
+        "#PlayerSelect"
+      ) as HTMLSelectElement;
+      if (playerSelectElement) {
+        const selectPlayerElement = new UKSelect({
+          element: playerSelectElement,
+          options: playerOptions,
+        });
+        selectPlayerElement.selected$.subscribe(async (selectedPlayer) => {
+          const playerData = await this._playerService.fetchPlayerPosition(
+            selectedPlayer.value
+          );
+          if (playerData) {
+            this._playerService.currentPlayer$.next({
+              id: selectedPlayer.value,
+              name: selectedPlayer.name,
+              ...playerData,
+            } as PlayerCreature);
+          }
+        });
+      }
+    });
+  };
 
-  const spaces = new TraversableSpaces({
-    spaceConfig: SPACE_CONFIG,
-    radiusInSquares: 3,
-    onMove: (s: any, pos: SimplePosition) => {
-      const relativePosition = {
-        x: pos.x / SPACE_CONFIG.w + 1,
-        y: pos.y / SPACE_CONFIG.h + 1,
-      };
-      character.pos$.next({
-        x: pos.x,
-        y: pos.y,
-      });
-      s.center$.next(relativePosition);
-      api.moveCharacter(CHARACTERS.Kendall, relativePosition);
-    },
-    center: lastPosition,
-  });
+  renderPlayer = (player: SimplePosition) => {
+    const character = new Player(
+      CHARACTER_CONFIGURATION,
+      {
+        x: (player.x - 1) * SPACE_CONFIG.w,
+        y: (player.y - 1) * SPACE_CONFIG.h,
+      },
+      SPACE_CONFIG
+    );
 
-  container.addChild(grid);
-  container.addChild(character.graphic);
-  container.addChild(spaces.spaces);
+    return character;
+  };
 
-  app.stage.addChild(container);
-};
+  renderTraversableSpaces = (
+    playerGraphic: Player,
+    player: SimplePosition & { id: string }
+  ) => {
+    const spaces = new TraversableSpaces({
+      spaceConfig: SPACE_CONFIG,
+      radiusInSquares: 3,
+      onMove: (s: any, pos: SimplePosition) => {
+        const relativePosition = {
+          x: pos.x / SPACE_CONFIG.w + 1,
+          y: pos.y / SPACE_CONFIG.h + 1,
+        };
+        playerGraphic.pos$.next({
+          x: pos.x,
+          y: pos.y,
+        });
+        s.center$.next(relativePosition);
+        this._playerService.api.movePlayer(player.id, relativePosition);
+      },
+      center: { x: player.x, y: player.y },
+    });
+    return spaces;
+  };
+}
 
-init();
+const playerService = new PlayerService();
+const main = new Main(playerService);

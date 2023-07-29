@@ -1,22 +1,22 @@
 import {
-  CharacterGraphicConfiguration,
+  PlayerGraphicConfiguration,
   SimplePosition,
   SpaceGraphicConfiguration,
 } from "models/models";
 import { Graphics } from "pixi.js";
 import { Subject } from "rxjs";
 
-class Character {
+class Player {
   graphic: Graphics;
   pos$: Subject<SimplePosition> = new Subject();
 
   constructor(
-    c: CharacterGraphicConfiguration,
+    c: PlayerGraphicConfiguration,
     cpos: SimplePosition,
     sConfig: SpaceGraphicConfiguration
   ) {
     this.pos$.next(cpos);
-    const character: Graphics = this.drawCharacter(c, sConfig);
+    const character: Graphics = this.drawPlayer(c, sConfig);
     character.x = cpos.x;
     character.y = cpos.y;
     this.graphic = character;
@@ -27,8 +27,8 @@ class Character {
     });
   }
 
-  drawCharacter = (
-    c: CharacterGraphicConfiguration,
+  drawPlayer = (
+    c: PlayerGraphicConfiguration,
     s: SpaceGraphicConfiguration
   ) => {
     const g = new Graphics();
@@ -40,4 +40,4 @@ class Character {
   };
 }
 
-export default Character;
+export default Player;

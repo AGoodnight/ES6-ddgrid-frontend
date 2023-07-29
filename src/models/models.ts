@@ -8,22 +8,27 @@ export type SimpleDimensions = {
   h: number;
 };
 
-export type Entity = {
+export type PlayerCreature = {
   id: string;
   alive: boolean;
-  hitPoints: number;
+  hitPonumbers: number;
   initiative: number;
   x: number;
   y: number;
+  category: string;
+  timeCreated: number;
+  timeModified: number;
   name: string;
 };
+
+export type PlayerCreatureKey = keyof PlayerCreature;
 
 export type SimplePallete = {
   fillColor?: string;
   lineColor?: string;
 };
 
-export type CharacterGraphicConfiguration = SimpleDimensions &
+export type PlayerGraphicConfiguration = SimpleDimensions &
   SimplePosition &
   SimplePallete;
 
