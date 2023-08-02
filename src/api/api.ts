@@ -1,4 +1,4 @@
-import { API_URL } from "../constants/config.constants";
+import { API_URL } from "constants/config.constants";
 import {
   PlayerCreature,
   PlayerCreatureKey,

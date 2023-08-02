@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 module.exports = {
   entry: "./src/index.ts",
@@ -9,6 +10,7 @@ module.exports = {
   },
   resolve: {
     extensions: [".ts", ".js", ".css"],
+    plugins: [new TsconfigPathsPlugin()],
   },
   module: {
     rules: [

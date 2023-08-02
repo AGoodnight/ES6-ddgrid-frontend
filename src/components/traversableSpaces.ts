@@ -102,7 +102,7 @@ class TraversableSpaces {
     if (c) {
       g.clear();
       g.lineStyle({ color: "#000", width: 1 });
-      g.beginFill(c.fillColor);
+      g.beginFill(c.fillColor, 0.3);
       g.drawRect(thisCenter.x, thisCenter.y, c.h, c.w);
       g.endFill();
       g.on("pointerdown", (event) => {

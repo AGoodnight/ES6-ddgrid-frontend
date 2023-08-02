@@ -21,7 +21,6 @@ export type UKSelectProps = {
 class UKSelect {
   selected$ = new ReplaySubject<UKOption>(1);
   private _options: UKOption[] = [];
-  private _onSelect: () => void = () => {};
   private _element: HTMLSelectElement | undefined = undefined;
 
   constructor({ options, element, onSelect }: UKSelectProps) {

@@ -1,6 +1,5 @@
-import Player from "components/player";
-import API from "../api/api";
-import { PlayerCreature, SimplePosition } from "../models/models";
+import API from "api/api";
+import { PlayerCreature, SimplePosition } from "models/models";
 import { ReplaySubject } from "rxjs";
 
 class PlayerService {
@@ -31,6 +30,8 @@ class PlayerService {
       "id",
       "name",
       "initiative",
+      "x",
+      "y",
     ]);
     if (!fetchedPlayers) {
       console.error("No Players Fetched, aborting");
