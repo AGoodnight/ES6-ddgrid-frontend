@@ -82,18 +82,6 @@ class Board {
   }
 
   createForm = () => {
-    const UsernameInput = document.querySelector(
-      "#Username"
-    ) as HTMLInputElement;
-    if (UsernameInput) {
-      const ukUserNameInput = new UkTextInput({
-        element: UsernameInput,
-        onChange: (value: string) => {
-          console.log(value);
-        },
-      });
-    }
-
     this._playerService.players$.subscribe((fetchedPlayers) => {
       this.players = fetchedPlayers;
       const playerOptions = fetchedPlayers?.reduce<UKOption[]>(
