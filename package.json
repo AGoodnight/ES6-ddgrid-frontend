@@ -25,9 +25,11 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@types/uuid": "^9.0.7",
     "navigo": "^8.11.1",
     "pixi.js": "^7.2.4",
     "rxjs": "^7.8.1",
-    "uikit": "^3.16.22"
+    "uikit": "^3.16.22",
+    "uuid": "^9.0.1"
   }
 }

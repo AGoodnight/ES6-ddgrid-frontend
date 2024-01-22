@@ -3,6 +3,8 @@ export type SimplePosition = {
   y: number;
 };
 
+export type FlatPosition = [number, number];
+
 export type SimpleDimensions = {
   w: number;
   h: number;
@@ -38,3 +40,5 @@ export type GridGraphicConfiguration = SimpleDimensions &
   };
 
 export type SpaceGraphicConfiguration = SimpleDimensions & SimplePallete;
+
+export type MoveHistoryRecord = { [key: string]: FlatPosition };
