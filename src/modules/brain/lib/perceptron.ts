@@ -55,40 +55,53 @@ export class Perceptron {
     return Array.from({ length: this.epochs }, (_, i) => i + 1).map(
       (_epoch: number) => {
         this.inputs.map((_input: number[], i: number) => {
-          // console.log(_input);
+
           const prediction = this.predict(_input);
+
+          // adjust the accuracy, based on if it got it right
           prediction === this.expected[i]
             ? (this.accuracy += 1)
             : (this.accuracy -= 1);
 
+          // track samples ran
           this.samples++;
 
           // calculate loss & update wieghts
+          // E = ( x - y ​) [ this may be incorrect or could be better to match l(y) = max(0,1-t*y) ]
           const loss = this.expected[i] - prediction;
-          // console.log(prediction);
+
           this.adjustWeights(_input, loss);
           this.adjustBias(loss);
         });
+
+        // return accuracy as a member of the return array
         return this.current_accuracy;
       }
     );
   }
 
   adjustWeights(input: number[], loss: number) {
+    // A = [ f(loss * xi * lr),...,n ]
     this.weights = this.weights.map((_weight, i: number) => {
       return (_weight += loss * input[i] * this.learn_rate);
     });
   }
 
   adjustBias(loss: number) {
+    // bias = loss * lr
     this.bias += loss * this.learn_rate;
   }
 
   activationFunction(n: any) {
+    // e = n(wi*xi) > 0
     return n < 0 ? 0 : 1;
   }
 
+  
   predict(input: number[]) {
+    // e = f( ∑wi*xi + b )
+    // or...
+    // total = bias + (w1 * x1) + (w2 + x2) ...
     const total = this.weights.reduce((_total, weight, i: number) => {
       return (_total += input[i] * weight);
     }, this.bias);
