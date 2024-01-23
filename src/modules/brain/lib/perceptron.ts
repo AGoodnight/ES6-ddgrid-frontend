@@ -99,6 +99,7 @@ export class Perceptron {
 
   
   predict(input: number[]) {
+    // performs linear regression
     // e = f( ∑wi*xi + b )
     // or...
     // total = bias + (w1 * x1) + (w2 + x2) ...
