@@ -1,8 +1,3 @@
-interface InputValues {
-  x: number[][];
-  y: number[][];
-}
-
 export class Perceptron {
   private bias: number = 0;
   private weights: number[] = [];

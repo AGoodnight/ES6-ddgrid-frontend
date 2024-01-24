@@ -35,4 +35,6 @@ const lastMovesAsRecord = lastMoves.reduce(
   {}
 );
 recorder.batchRecord(lastMovesAsRecord);
-brain.think([0, 1, 0, 1, 1]);
+// Make the brain smarter
+Array.from({length:100},()=>brain.fit());
+// brain.think([0, 1, 0, 1, 1]);
